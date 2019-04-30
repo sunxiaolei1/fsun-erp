@@ -1,0 +1,23 @@
+/*初始化*/
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,address,code,em,img,strong,dl,dt,dd,ol,ul,li, fieldset,form,label,legend,table,tbody,tr,th,td,select,input{margin:0;padding:0;}
+img{border:none;}
+.m-auto{margin:0 auto;}
+.clear{clear:both;line-height:0;padding:0;margin:0;font-size:0; border:0;overflow:hidden;}
+.left{float:left;}
+.right{float:right;}
+.tl{text-align:left;}
+.tr{text-align:right;}
+.tc{text-align:center;}
+ul,li{list-style:none;}
+a:link,a:visited{ color:#000; text-decoration:none;}
+a:hover{ color:#FF0000; text-decoration:underline;}
+
+body{background-color:#FFFFFF;font-size:55px;color:#a1afbb;font-family:"黑体";align:center;}
+table.jh{margin-top:-2px;}
+.jh tr td{height:29px;border-top:2px #333 solid;line-height:29x; text-align:center;width:25%;}
+
+.green-font{color:#FF0000;font-family:"黑体";align:center;font-size:33px;}
+.red-font{color:#33FF00;font-family:"黑体";align:center;font-size:33px;}
+.font-arial{font-family:Arial, Helvetica, sans-serif;align:center;color:#33FF00;font-size:33px;}
+
+.showTime{width:450px;color:#FF0000;background-color:#dddfe8;border:0px solid; margin-top:16px; font-size:25px;font-family:"黑体";}

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<beans xmlns="http://www.springframework.org/schema/beans"  
+    xmlns:amq="http://activemq.apache.org/schema/core"  
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:context="http://www.springframework.org/schema/context" 
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd  
+    http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd">  
+     
+    <context:component-scan
+		base-package="
+		cn.com.fsun.client.rpc.configure
+		cn.com.fsun.client.rpc.service.impl
+		" />  
+		
+    <!-- 只做消息发送时使用       
+    <context:property-placeholder location="classpath:activemq.properties"/>
+
+    <bean id="sendConnectionFactory" class="org.apache.activemq.spring.ActiveMQConnectionFactory">
+        <property name="brokerURL" value="${activemq.url}" />
+        <property name="userName" value="${activemq.username}" />
+        <property name="password" value="${activemq.password}" />
+    </bean>
+    
+     <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">  
+        <property name="connectionFactory" ref="sendConnectionFactory"></property>  
+    </bean>
+    -->
+    
+    <!-- 
+    <bean id="connectionFactory" class="org.springframework.jndi.JndiObjectFactoryBean">  
+       <property name="jndiName" value="java:comp/env/myJMS/ConnectionFactory"></property>
+    </bean>    
+     
+    <bean id="emailSendQueue" class="org.springframework.jndi.JndiObjectFactoryBean">  
+       <property name="jndiName" value="java:comp/env/myJMS/emailSendQueue"></property> 
+    </bean>
+    
+     <bean id="emailAddToSendQueue" class="org.springframework.jndi.JndiObjectFactoryBean">  
+       <property name="jndiName" value="java:comp/env/myJMS/emailAddToSendQueue"></property> 
+    </bean>
+  
+    <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">  
+        <property name="connectionFactory" ref="connectionFactory"></property>  
+        <property name="defaultDestination" ref="emailSendQueue"></property>  
+    </bean>  
+     -->
+</beans>  

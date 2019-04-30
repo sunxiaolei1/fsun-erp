@@ -1,0 +1,15 @@
+<Context>
+	
+	<Resource name="myJMS/ConnectionFactory" 	     
+		auth="Container"     
+		type="org.apache.activemq.ActiveMQConnectionFactory"   
+		description="JMS Connection Factory"  
+		factory="org.apache.activemq.jndi.JNDIReferenceFactory"  
+		brokerURL="failover:(tcp://lenovo-THINK:61616)?initialReconnectDelay=7200&amp;maxReconnectAttempts=2"
+		brokerName="MyActiveMQBroker"
+		useEmbeddedBroker="false"
+		userName="sunxl" 
+        password="sunxl"
+		/>  
+	 	 
+</Context>

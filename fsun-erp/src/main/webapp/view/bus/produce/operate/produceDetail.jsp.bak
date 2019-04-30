@@ -1,0 +1,254 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<script type="text/javascript"
+	src="<c:url value='/js/jquery-easyui/jquery.role_edatagrid.js'/>"></script>
+<script type="text/javascript" 
+	src="<c:url value='/js/jquery-easyui/datagrid-detailview.js'/>"></script>
+	
+	 	
+<div id="outsourcingToolbar" style="display:none;"> 
+     <span style="position:right">
+       		<label ><font color="red" >工艺流程：</font></label>
+      	 	<input id="process"  class="easyui-combobox" style="width:80px;" editable="false" />  	
+      		<label ><font color="red" >外协方：</font></label>
+      	 	<input id="outsourcier"  style="width:80px;" class="easyui-combobox" editable="false" /> 	      	 	
+		    <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-redo"  plain="true" onclick="outsourcing()">制作外协单</a>
+		    <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-print"  plain="true" onclick="definedMakeDeliver()">自定义送货单</a>    	      
+     </span>
+</div>
+
+<div  id="openOrderDetailsDiv" class="easyui-window" shadow= "false" title="订单详情" closed="true" align="center" style="display:none;width:900px;height:auto;top:10px;" modal="true">
+	<div id="baseInfoPanel" class="easyui-panel" title="基本信息" collapsible="true"  collapsed="false"  style="width:885px;height:auto;padding:5px;">
+		<form id ="detailfm" method="GET">
+		    <input hidden="true" name="id" />
+			<table border="0" class="table-new"  cellpadding="3"   cellspacing="3">
+	    	 	<tr>
+	    	 		<td class="textField1">
+	    	 			订单编号：
+	    	 		</td >
+	    	 		<td>
+	    	 			<input class="unFrameTextField" name="code" />
+	    	 		</td> 
+	    	 		<td class="textField1">
+	    	 			订单类型：
+	    	 		</td >
+	    	 		<td>
+	    	 			<input class="unFrameTextField" name="orderType"/>
+	    	 		</td> 
+	    	 		<td class="textField1" >
+	    	 			制单人：
+	    	 		</td >
+    	 			<td>
+	    	 			<input class="unFrameTextField" name="createManName" />
+	    	 		</td> 	 				    	 		
+	    	 	</tr>
+	    	 	<tr>		    	 		
+		    	 	<td class="textField1">
+	    	 			交货时间：
+	    	 		</td>   	 		
+	    	 		<td>
+	    	 			<input  class="unFrameTextField" name="receiveTime" />
+	    	 		</td>	    	 	    		    	 		
+	       	 		<td class="textField1">
+	    	 			快件单号：
+	    	 		</td>
+	    	 		<td>
+	    	 		 <input class="unFrameTextField" name="express" /> 
+	    	 		</td >
+	    	 		<td class="textField1" >
+	    	 			    合同号：
+	    	 		</td >
+	    	 		<td>
+	    	 			<input class="unFrameTextField" name="contract" />
+	       	 		</td>
+	    	 	</tr>
+	    	 	<tr>
+	    	 		<td class="textField1">
+	    	 			客户名称：
+	    	 		</td >
+	    	 		<td>
+	    	 			<input class="unFrameTextField" name="customerName" />
+	    	 		</td> 		    	 		
+	    	 		<td class="textField1" >
+	    	 			联系电话：
+	    	 		</td >
+    	 			<td>
+	    	 			<input class="unFrameTextField" name="tel" />
+	    	 		</td> 
+	    	 		<td class="textField1">
+	    	 			联系人：
+	    	 		</td >
+	    	 		<td>
+	    	 			<input class="unFrameTextField" name="contacts"/>
+	    	 		</td> 	 				    	 		
+	    	 	</tr>	    	 	
+	    	 </table>	    	
+	    	 <table border="0" class="table-new"  cellpadding="3"   cellspacing="3">
+	    	 	<tr>	   	 		
+	    	 		<td class="textField1">
+	    	 			客户地址：
+	    	 		</td>
+	    	 		<td>
+	    	 		 	<input class="unFrameTextField" style="width: 600px;" name="address" ></input>
+	    	 		</td >		    	 		
+	    	 	</tr>
+	    	 	<tr>	   	 		
+	    	 		<td class="textField1">
+	    	 			备注：
+	    	 		</td>
+	    	 		<td>
+	    	 		 	<input class="unFrameTextField" style="width: 600px" name="description" ></input>
+	    	 		</td >		    	 		
+	    	 	</tr>
+	    	 </table>
+		</form>
+	</div>
+	<div id="productDetailsPanel" class="easyui-panel" title="货物信息" style="width:885px;height:300px;padding:5px;">
+		<table id="productDetailsList" style="width:820px;height:auto">
+        	
+    	</table>
+	</div>
+	
+</div>
+
+<div id="rightKey" class="easyui-menu" style="display:none;width:120px;border: 2px solid rgb(211, 211, 211);" title="操作">
+    <sec:authorize  ifAllGranted="UPDATE_NUMBER"><div onClick="updateNumber()" data-options="iconCls:'icon-edit'">添加实际数量</div></sec:authorize>	
+</div>
+
+<%@include file="outsourcing.jsp"%>
+
+<script type="text/javascript">
+
+$(function() {
+
+	//$("#rightKey").show();		
+	$("#openOrderDetailsDiv").show();
+	$("#outsourcingToolbar").show();
+
+	$('#process').combobox({							
+		method:'get',
+        required: true,
+	    url:'<c:url value="/sys/dictionary/getGroupList?key=PRODUCT_PROCESS"/>',
+		valueField:'key',
+		textField:'value',
+		panelHeight:'auto',
+		onLoadSuccess:function(result){		
+			if(result.length>0){
+				$(this).combobox("select",result[0].key);
+		    }													 
+		},
+	    onSelect:function(value){	
+	    	$('#outsourcier').combobox({							
+				method:'get',
+	            required: true,
+	    	    url:'<c:url value="/bus/factoryInfo/getFactorylistByTechnology?technology="/>'+encodeURI(encodeURI(value.key)),
+				valueField:'name',
+				textField:'name',
+				panelHeight:'auto',
+				onLoadSuccess:function(result){		
+    				 if(result.length>0){
+    					 $(this).combobox("select",result[0].name);
+        		     }													 
+				  }			   	 																																																											
+	    	});			
+	    }   			   	 																																																											
+	});
+
+});
+
+var rightKeyRowIndex ='';	
+function updateNumber(){
+	 $("#productDetailsList").edatagrid('beginEdit', rightKeyRowIndex);  
+	 var ed = $("#productDetailsList").edatagrid('getEditor',{index:rightKeyRowIndex,field:'realNumber'});	   	
+	 //$(ed.target).numberbox({
+	//	 onChange : function(n,o){
+		 	//$("#productDetailsList").edatagrid('endEdit', rightKeyRowIndex);
+		 	//$("#productDetailsList").edatagrid('refreshRow',rightKeyRowIndex);			 	
+	//	 }
+	// });
+
+	 $(ed.target).bind('keyup',function(event){
+		if(event.keyCode=="13"){
+			$("#productDetailsList").edatagrid('endEdit', rightKeyRowIndex);
+		}
+	 });
+}
+
+function openOrderDetails(rowData){
+	$.ajax({
+    	url:'<c:url value="/bus/order/load"/>',
+    	dataType: "json",
+    	data:{id:rowData.id},
+    	async:false,
+    	success:function(rowData){	
+    		var detail = rowData.rows;     		   	        		
+    		$('#detailfm').form('load',detail);
+    	}
+    });
+	$('#productDetailsList').edatagrid({
+		pagination: false,
+		fit: true,
+		nowrap: false,
+		rownumbers: true,
+		fitColumns: false,
+		singleSelect: false,
+		ctrlSelect: false,
+		pageSize: 20,
+		method:'GET',
+		loadMsg:'加载中，请稍等。。。',
+    	url: '<c:url value="/bus/orderDetail/search?orderId=' + rowData.id + '"/>',
+    	saveUrl: '<c:url value="/bus/orderDetail/save"/>',
+    	updateUrl: '<c:url value="/bus/orderDetail/update"/>',
+    	onSave: function(index,row){
+        	//$('#productDetailsList').edatagrid('clearSelections');
+        	//$('#productDetailsList').edatagrid('reload'); 
+        },
+    	columns:[[	
+    	    {field:'id',checkbox:true,width:"80"},					
+			{field:'orderId',hidden:true},	
+			{field:'productCode',title: '产品编号',hidden:true},				
+			{field:'productName',title: '产品名称',width:"130",formatter:contentWrap},
+			{field:'style',title: '款号',width:"90"},
+			{field:'number',title: '数量',width:"70"},									
+			{field:'realNumber',title: '实际数量',width:"70",editor:'numberbox'},
+			{field:'unit',title: '单位',width:"30"},	
+			{field:'papers',title: '大张数量',width:"70"},
+			{field:'prints',title: '印次',width:"70"},											
+			{field:'description',title: '备注',width:"235",formatter:contentWrap}
+    	]],
+    	toolbar:"#outsourcingToolbar",
+    	onRowContextMenu: function(e, rowIndex, rowData){
+    		e.preventDefault();
+		   	//var selected=$("#list-table").datagrid('getSelected'); //获取所有行集合对象
+		    //selected[rowIndex].id; //index为当前右键行的索引，指向当前行对象
+		    $(this).datagrid('clearSelections');
+		    $(this).datagrid('selectRow', rowIndex);
+		    rightKeyRowIndex = rowIndex;
+		    $('#rightKey').menu('show', {
+		        left:e.pageX,
+		        top:e.pageY
+		    }); 
+    	},
+    	view: detailview,
+		detailFormatter:function(index,row){  
+            return '<div id="detailForm-'+index+'"></div>';  
+        },  
+        onExpandRow: function(index,row){  		
+            $('#detailForm-'+index).panel({  
+                doSize:true,  
+                border:false,  
+                cache:false,  
+                //href:'form.jsp?id='+id+'&index='+index,  
+               	href:'<c:url value="/bus/produce/product/view?rowIndex='+ index +'&productCode=' + row.productCode + '"/>',
+                onLoad:function(){
+                    $('#productDetailsList').edatagrid('selectRow',index);
+                    $('#productDetailsList').edatagrid('fixDetailRowHeight',index);
+                }  
+            });
+            $('#productDetailsList').edatagrid('fixDetailRowHeight',index);
+        }
+    });
+	$("#openOrderDetailsDiv").window("open");
+	
+}
+
+</script>

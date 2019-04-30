@@ -1,0 +1,303 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
+<div id="produceTableHead">		 
+	<table id="produceHead" border="1" cellSpacing=0 cellPadding=0 width="100%" height="46px;">	  			  
+  	 	
+  	 	</table>	
+</div>
+
+<div id="produceTableContext" style="display:none;" >		 
+	<table id="productContext" border="0" cellSpacing=0 cellPadding=0 width="100%" height="46px;">	  			  
+  	 	
+  	 	</table>	
+</div>
+
+<div id="tableProductFoot" style="display:none;" >	
+ 	<DIV align=right>
+ 		<font>制作：雨田工作室</font>
+ 		<font>电话：18868384668</font>
+ 	</DIV>
+</div>
+
+<script type="text/javascript">
+
+/***************************************** 制作生产单的操作  ***************************************************/
+	$(function(){
+		$("#tableProductFoot").show();
+		$("#produceTableContext").show();	
+	})
+
+	//制作生产单
+	function makeProduce(){
+		var orders = $('#list-table').datagrid('getChecked');
+		if(orders.length>0){
+			var ids = new Array();       	 
+			for(var i=0;i<orders.length;i++){
+				var order = orders[i];
+				ids.push(order.id);   				
+			}
+			$.ajax({
+	        	url:'<c:url value="/bus/produce/getProduceInfo"/>',
+	        	dataType: "json",
+	        	data:{ids:ids.length!=0?ids.join(','):''},
+	        	async:false,
+	        	success:function(rowData){	
+ 					var produces = rowData.rows;
+ 					produceView(produces);
+	        	}
+	        });	
+		}else{
+			$.messager.alert('提示','请选择订单','info');
+			return;
+		}
+	}
+
+	function produceView(produces){
+        if(produces.length>0){
+        	var LODOP=getLodop();  
+    		LODOP.PRINT_INIT("生产单打印");
+    		LODOP.SET_PRINT_PAGESIZE(1,"210mm","297mm","A4");		   			
+			for(var i=0;i<produces.length;i++){				
+				CreateOnePage(LODOP,produces[i]);//只有订单基本信息的表头的生产单
+				LODOP.NewPage();
+			}
+			var prints = LODOP.PREVIEW();
+			if(prints>0){
+				var ids = new Array();       	 
+				for(var i=0;i<produces.length;i++){
+					var order = produces[i].orderInfo;
+					ids.push(order.id);   				
+				}
+				$.ajax({
+		        	url:'<c:url value="/bus/produce/changeProducePrintStatus"/>',
+		        	dataType: "json",
+		        	data:{id:ids.length!=0?ids.join(','):''},
+		        	async:false,
+		        	success:function(rowData){	
+		        		$('#list-table').edatagrid('clearSelections');
+	                	$('#list-table').edatagrid('reload'); 
+		        	}
+		        });	
+			}
+			
+        }
+	}
+
+	function CreateOnePage(LODOP,produce){
+
+		if($("#productContext")){
+			$("#productContext").empty();
+		} 
+		CreateTableProduct(produce.orderProductDtoList,"productContext");		 		
+   		//var css = '<link rel="stylesheet" href="<c:url value='/css/style.css'/>"/>';
+   		//LODOP.ADD_PRINT_TABLE(305,"5%","90%",814,css+document.getElementById("produceTableContext").innerHTML); 		
+   		LODOP.ADD_PRINT_TABLE(165,"3%","90%",814,document.getElementById("produceTableContext").innerHTML);
+   		LODOP.SET_PRINT_STYLEA(0,"Vorient",3);
+   		
+   		var now = new Date();
+   	 	LODOP.ADD_PRINT_HTM(14,"5%","50%",14,"打印时间："+now.getFullYear()+"-"+((now.getMonth()+1)<10?"0":"")+(now.getMonth()+1)+"-"+(now.getDate()<10?"0":"")+now.getDate());
+		LODOP.SET_PRINT_STYLEA(0,"ItemType",1);
+		LODOP.SET_PRINT_STYLEA(0,"LinkedItem",1);
+
+		//LODOP.ADD_PRINT_HTM(14,"80%","50%",14,"<font color='#0000ff' format='ChineseNum'><span tdata='pageNO'>第##页</span>/<span tdata='pageCount'>共##页</span></font>");
+		LODOP.ADD_PRINT_HTM(14,"80%","50%",14,"<font color='#0000ff'><span tdata='pageNO'>第##页</span>/<span tdata='pageCount'>共##页</span></font>");
+		LODOP.SET_PRINT_STYLEA(0,"ItemType",1);
+		LODOP.SET_PRINT_STYLEA(0,"Horient",1);
+
+		LODOP.SET_PRINT_STYLE("FontSize",18);
+		LODOP.SET_PRINT_STYLE("Bold",1);
+		LODOP.ADD_PRINT_TEXT(40,"87mm",210,39,"${applicationScope.companyLtd}生产单");
+		LODOP.SET_PRINT_STYLEA(0,"ItemType",1);
+   		LODOP.SET_PRINT_STYLEA(0,"LinkedItem",1);
+
+		createProduceTableHead(produce,"produceHead"); 
+   		LODOP.ADD_PRINT_HTM(86,"3%","95%",200,document.getElementById("produceTableHead").innerHTML);
+   		LODOP.SET_PRINT_STYLEA(0,"ItemType",1);
+   		LODOP.SET_PRINT_STYLEA(0,"LinkedItem",1);
+		
+   	   // LODOP.ADD_PRINT_HTM(1134,"3%","95%",14,document.getElementById("tableProductFoot").innerHTML);
+   		//LODOP.SET_PRINT_STYLEA(0,"ItemType",1);
+   		//LODOP.SET_PRINT_STYLEA(0,"LinkedItem",1);
+   		
+		
+	};	
+	
+    /************************************  创建生产单的主体内容  ********************************/
+	function CreateTableProduct(orderProductDtoList,div){
+		 var tbody = $("#"+div);
+		 for(var i=0;i<orderProductDtoList.length;i++){
+
+			 var tr=$("<tr></tr>");
+			 tr.appendTo(tbody);
+			 var td = $("<td></td>");			 
+			 td.appendTo(tr);
+			 createProductBaseInfo(td,orderProductDtoList[i]);
+			 
+			 tr=$("<tr></tr>");
+			 tr.appendTo(tbody);
+			 td = $("<td></td>");			 
+			 td.appendTo(tr);
+			 createProductDetial(td,orderProductDtoList[i]);		 
+		 }
+	}
+
+	function createProductDetial(td,orderProductDto){
+	//	var productInfo = orderProductDto.productInfo;
+		var orderDetailList = orderProductDto.orderDetailList;
+	//	var afterProcessList = orderProductDto.afterProcess;
+        if(orderDetailList.length>0){
+
+        	var table = $("<table width='100%' style='font-size:medium;margin-top:2px;' border='1' cellpadding='0' cellspacing='0'></table>");
+    	    table.appendTo(td);
+    	    
+        	var tableHeadTr = $("<tr></tr>"); 	
+    		tableHeadTr.appendTo(table);	
+    		var tableTds = $("<td style='width:90px;' >产品款号</td>"+   	    				  
+    	    				  "<td style='width:90px;' >应产数量</td>"+
+    	    				  "<td style='width:90px;' >实产数量</td>"+
+    	    				  "<td style='width:50px;' >单位</td>"+
+    	    				  "<td style='width:90px;' >大张数量 </td>"+
+    	    				  "<td style='width:90px;' >印次 </td>"+
+    	    				  "<td style='width:80px;' >备注</td>"); 
+    			tableTds.appendTo(tableHeadTr);
+
+    	    for(var g = 0;g<orderDetailList.length;g++){
+   		    	 var orderDetailDto = orderDetailList[g];
+   	    		 var tableContentTr = $("<tr>"+
+   											"<td>"+orderDetailDto.style+"</td>"+
+   											"<td>"+orderDetailDto.number+"</td>"+
+   											"<td></td>"+		
+   											"<td>"+orderDetailDto.unit+"</td>"+
+   											"<td>"+orderDetailDto.papers+"</td>"+
+   											"<td>"+orderDetailDto.prints+"</td>"+
+   											"<td>"+orderDetailDto.description+"</td>"+											
+   										"</tr>");
+   	    		 tableContentTr.appendTo(table);
+   		    }
+	    	
+        	//$("<div style='clear:both;'></div>").appendTo(div);
+        }
+
+	}
+
+	/*****************************************     创建生产单的表头，内容只有订单基本信息         *******************************/
+	function createProduceTableHead(produce,div1){
+		
+		 var tbody = $("#"+div1);
+		 tbody.empty();
+		 var order = produce.orderInfo;
+	     var tr=$("<tr></tr>");
+	     tr.appendTo(tbody);
+	     var td = $("<td>订单编号：<span>"+ order.code +"</span></td>");			 
+		 td.appendTo(tr);	
+		 td = $("<td>订单类型：<span>"+ order.orderType +"</span></td>");			 
+		 td.appendTo(tr);
+		 td = $("<td>下单时间：<span>"+ (order.merchandTime!=null?order.merchandTime.substr(0,10):'') +"</span></td>");			 
+		 td.appendTo(tr);	
+
+		 tr=$("<tr></tr>");
+	     tr.appendTo(tbody);
+	     td = $("<td>订单状态：<span>"+ order.status +"</span></td>");			 
+		 td.appendTo(tr);	
+		 td = $("<td>制单人：<span>"+ order.createManName +"</span></td>");			 
+		 td.appendTo(tr);
+		 td = $("<td>制单时间：<span>"+ (order.createTime!=null?order.createTime.substr(0,10):'') +"</span></td>");			 
+		 td.appendTo(tr);
+		 
+		 tr=$("<tr></tr>");
+	     tr.appendTo(tbody);     	
+		 td = $("<td  colspan='2'>备注：<span>"+ (order.description!=null?order.description:"") +"</span></td>");	 
+		 td.appendTo(tr);
+		 td = $("<td>交货时间：<span>"+ (order.receiveTime!=null?order.receiveTime:"") +"</span></td>");			 
+		 td.appendTo(tr);
+		 
+	}
+
+	/**
+	创建产品基本信息
+	**/
+	function createProductBaseInfo(td,orderProductDto){
+		var productInfo = orderProductDto.productInfo;
+		var afterProcessList = orderProductDto.afterProcess;
+		var div = $("<div style='border:1px #ccc solid;padding:5px;font-size:12px;line-height:21px;width: 750px;'></div>");		
+		div.appendTo(td);
+		var childDiv = $("<div></div>");	
+			childDiv.appendTo(div);
+			var ul = $("<ul style='list-style:none;font-size:12px;line-height:24px;margin:0;padding:0;font-family:Arial, Helvetica, sans-serif,'宋体';list-style:none;font-size:12px;line-height:24px;'></ul>");
+				ul.appendTo(childDiv);
+				var url = '';
+				if(productInfo.icon){
+					url = "<c:url value='/uploads/product/"+ productInfo.icon +"'/>";
+				}else{
+					ur1 = "<c:url value='/images/no_icon.png'/>";
+				}
+				var li1 = $("<li style='width:445px;float:left;'><img src='"+ url +"' width='444' height='330'/></li>");
+				li1.appendTo(ul);
+
+				var li4 = $("<li style='width:160px;white-space:nowrap;padding-left:10px;float:left;'>"+
+						   "<h1 style='font-size:18px;font-weight:bold;padding:0;margin:0;height:28px;line-height:28px;color:#06c;'>"+productInfo.name+"</h1>"+
+						   "<span>材&nbsp;&nbsp;质&nbsp;&nbsp;名&nbsp;&nbsp;称:&nbsp;&nbsp;</span>"+(productInfo.material!=null?productInfo.material:'')+"<br />"+			   			               
+						   "<span>规&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;格:&nbsp;&nbsp;</span>"+(productInfo.spec!=null?productInfo.spec:'')+"<br />"+
+			               "<span>开&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;数(开):&nbsp;&nbsp;</span>"+(productInfo.openNum!=null?productInfo.openNum:'')+"<br />"+			               
+			               "<span>开&nbsp;&nbsp;料&nbsp;&nbsp;尺&nbsp;&nbsp;寸:&nbsp;&nbsp;</span>"+(productInfo.openSize!=null?productInfo.openSize:'')+"<br />"+							
+
+			               "<span>生&nbsp;&nbsp;产&nbsp;&nbsp;机&nbsp;&nbsp;型:&nbsp;&nbsp;</span>"+(productInfo.model!=null?productInfo.model:'')+"<br />"+
+			               "<span>工&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;序:&nbsp;&nbsp;</span>"+(productInfo.process!=null?productInfo.process:'')+"<br />"+	
+			               "<span>是&nbsp;&nbsp;否&nbsp;&nbsp;外&nbsp;&nbsp;协:&nbsp;&nbsp;</span>"+(productInfo.outsourc?'是':'否')+"<br />"+
+			               "<span>拼&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;版:&nbsp;&nbsp;</span>"+(productInfo.layout!=null?productInfo.layout:'')+"<br />"+
+			               "<span>拼&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;数:&nbsp;&nbsp;</span>"+(productInfo.impos!=null?productInfo.impos:'')+"<br />"+
+			               "<span>色&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;数(色):&nbsp;&nbsp;</span>"+(productInfo.colors!=null?productInfo.colors:'')+"<br />"+
+						   "</li>");
+				li4.appendTo(ul); 
+				
+				var li2 = $("<li style='width:110px;padding-left:10px;float:left;'>"+
+							
+							"<span>产&nbsp;&nbsp;品&nbsp;&nbsp;编&nbsp;&nbsp;号:&nbsp;&nbsp;</span>"+productInfo.code+"<br />"+
+							"<span>菲&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;林:&nbsp;&nbsp;</span>"+(productInfo.film?'是':'否')+"<br />"+
+							"<span>透&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;明&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;纸:&nbsp;&nbsp;</span>"+(productInfo.scotch?'是':'否')+"<br />"+
+							
+			                						  +"</li>"); 
+				li2.appendTo(ul);
+
+				 
+	
+			var clear =$("<div style='clear:both;'></div>"); 		
+			clear.appendTo(childDiv);
+	    $("<div style='clear:both;'></div>").appendTo(div);
+	    $("<div style='clear:both;'></div>").appendTo(div);
+	    $("<div style='border-top:1px #ccc dotted;border-bottom:1px #ccc dotted;padding:5px 0;margin:10px 0;'><span>开料方法： </span>"+(productInfo.openMethod!=null?productInfo.openMethod:'')+"</div>").appendTo(div);
+	    $("<div style='border-top:1px #ccc dotted;border-bottom:1px #ccc dotted;padding:10px 0;margin:10px 0;'><span>注意事项： </span>"+(productInfo.description!=null?productInfo.description:'')+"</div>").appendTo(div);
+
+	    $("<div style='clear:both;'></div>").appendTo(div);	    
+        
+        if(afterProcessList.length>0){
+
+        	var table = $("<table width='100%' style='font-size:medium;margin-top:10px;' border='1' cellpadding='0' cellspacing='0'></table>");
+    	    table.appendTo(div);
+    	    
+        	var tableHeadTr = $("<tr></tr>"); 	
+    		tableHeadTr.appendTo(table);	
+    		var tableTds = $("<td style='width:90px;' >后道工序</td>"+
+    	    				  "<td style='width:50px;' >外协</td>"+
+    	    				  "<td style='width:90px;' >应产数量</td>"+
+    	    				  "<td style='width:120px;' >工艺要求</td>"+
+    	    				  "<td style='width:80px;' >备注</td>"); 
+    			tableTds.appendTo(tableHeadTr);
+
+    	    for(var g = 0;g<afterProcessList.length;g++){
+   		    	 var afterProcessDto = afterProcessList[g];
+   	    		 var tableContentTr = $("<tr>"+
+   											"<td>"+afterProcessDto.name+"</td>"+
+   											"<td>"+afterProcessDto.isOutsourc+"</td>"+
+   											"<td></td>"+		
+   											"<td>"+afterProcessDto.demand+"</td>"+
+   											"<td>"+afterProcessDto.description+"</td>"+
+   										"</tr>");
+   	    		 tableContentTr.appendTo(table);
+   		    }
+	    	
+        	$("<div style='clear:both;'></div>").appendTo(div);
+        }
+	}
+
+</script>

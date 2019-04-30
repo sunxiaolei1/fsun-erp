@@ -1,0 +1,47 @@
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,address,code,em,img,strong,dl,dt,dd,ol,ul,li, fieldset,form,label,legend,table,tbody,tr,th,td,select,input{margin:0;padding:0;}
+img{border:none;}
+.m-auto{margin:0 auto;}
+.clear{clear:both;line-height:0;padding:0;margin:0;font-size:0; border:0;overflow:hidden;}
+.left{float:left;}
+.right{float:right;}
+.tl{text-align:left;}
+.tr{text-align:right;}
+.tc{text-align:center;}
+ul,li{list-style:none;}
+a:link,a:visited{ color:#000; text-decoration:none;}
+a:hover{ color:#FF0000; text-decoration:underline;}
+a:focus {
+    outline:none;
+}
+#container{
+	height:366px;
+}
+
+.three-level-menu-bg{ border-bottom:1px #d8e6f3 solid;background-color:#fafaf8;font-size:12px;height:40px;line-height:40px; padding:0 15px;color:#3c6789;position: fixed;top:0;left:0;width:100%;z-index:1001}
+.three-level-menu-bg div.left{margin-right:10px;}
+.three-level-menu-bg .left b a{color:#3c6789;}
+.three-level-menu{margin-left:10px;}
+.three-level-menu a{display:inline-block;}
+.project-wrap{margin-top:50px;}
+
+
+.gray-line{ border-left:1px #eee solid;border-right:1px #eee solid;padding:0 15px;}
+
+/* 搜索框 */
+.search-bg{ border:1px #ebebeb solid;height:32px;margin-top:3px; padding:0 2px 0 10px;border-radius:2px;margin-left:5px;margin-right:20px;background-color:#fff;}
+.search-input{width:100px;font-size:12px;line-height:32px;border:0;background:none;font-family:Arial, Helvetica, sans-serif,"宋体";}
+.search-btn{display:inline-block;width:32px;height:32px;background:url(../images/v4.1.0/icons/icon2.png) 8px -484px no-repeat;border:0;cursor:pointer;}
+
+
+a.add-btn1{display:inline-block;height:21px;line-height:21px;padding:0 10px 0 25px;cursor:pointer;}
+a.add-btn1{border:1px #e0e0e0 solid;border-radius:2px;background:url(../images/v4.1.0/icons/icon3.png) 10px 0px no-repeat #fff;}
+a.add-btn1:hover{border:1px #c1e1f5 solid;border-radius:2px;background:url(../images/v4.1.0/icons/icon3.png) 10px -21px no-repeat #fff; text-decoration:none;color:#21a7fe;}
+
+
+.blue-btn,.white-btn{border-radius:3px;height:28px;line-height:24px;padding:0 20px;display:inline-block; vertical-align:middle; cursor:pointer;}
+.blue-btn{background-color:#0696f6;border:1px #0696f6 solid;color:#fff;}
+.white-btn{background-color:#f5f5f5;border:1px #ccc solid;color:#333;}
+.hidden{display:none;}
+
+/* 删除线  */
+.deleteLine{text-decoration:line-through;} 

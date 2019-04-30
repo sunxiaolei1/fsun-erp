@@ -1,0 +1,150 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans   
+	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd  
+	http://www.springframework.org/schema/mvc  
+	http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+	http://www.springframework.org/schema/context   
+	http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+	<context:annotation-config />
+	<!--
+			 一些注解我们比较常用，尤其是Antowired的注解，在自动注入的时候更是经常使用，所以如果总是需要按照传统的方式一条一条
+			 配置显得有些繁琐和没有必要，于是spring给我们提供<context:annotation-config/>的简化配置方式，自动帮你完成声明。
+			不过，呵呵，我们使用注解一般都会配置扫描包路径选项<context:component-scan base-package=”XX.XX”/> 
+			该配置项其实也包含了自动注入上述processor的功能，因此当使用 <context:component-scan/> 后，
+			就可以将 <context:annotation-config/> 移除了
+		<context:annotation-config />
+		-->
+	
+	<!-- 自动扫描cn.com.fsun.sys.web包下的@Controller标注的类控制器类 -->
+	<context:component-scan base-package="
+	cn.com.fsun.bus.web 
+	cn.com.fsun.bus.client
+	cn.com.fsun.bus.validator
+	cn.com.fsun.sys.web 
+	cn.com.fsun.common.web" />
+	
+	<!-- 启动Spring MVC的注解功能，完成请求和注解POJO的映射 -->
+	<mvc:resources mapping="/js/**" location="/js/"/> 
+	<mvc:resources mapping="/css/**" location="/css/"/> 
+	<mvc:resources mapping="/images/**" location="/images/"/> 
+	<mvc:resources mapping="/view/**" location="/view/"/> 
+	<mvc:default-servlet-handler />
+	
+	<!--拦截器-->
+	<bean
+		class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
+		<property name="order" value="8" />
+		<property name="useDefaultSuffixPattern" value="false" />
+	</bean>
+	
+	
+	<!-- 声明viewResolver(对模型视图名称的解析，在请求时模型视图名称添加前后缀) -->
+	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+		<property name="prefix" value="/view/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+	
+	<!-- 类型转换和格式化 -->
+	<bean id="conversionService"
+		class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+		<property name="converters">
+			<list>
+				<!-- 
+					可以添加自己的转换器
+					<bean class="sanlogic.vdi.common.utils.StringToDateConverter" />
+					 -->
+			</list>
+		</property>
+	</bean>
+	
+	<!-- 文件上传 --> 
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver"
+		p:defaultEncoding="UTF-8"
+		p:maxUploadSize="50000000"
+		p:uploadTempDir="upload/temp"/>  
+		
+	<bean id="messageSource"
+		class="org.springframework.context.support.ResourceBundleMessageSource"
+		p:basename="i18n/messages" />
+
+	<bean
+		class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+		<property name="order" value="1" />
+		<property name="ignoreAcceptHeader" value="true" />
+		<property name="defaultContentType" value="text/html" />
+		<property name="mediaTypes">
+			<map>
+				<entry key="json" value="application/json" />
+				<entry key="xml" value="application/xml" />
+				<entry key="html" value="text/html" />
+			</map>
+		</property>
+		<property name="favorParameter" value="false" />
+		<!-- 设置这个视图解析器捆绑的视图解析器,这个属性若没有设置，它将自动选择 -->
+		<property name="viewResolvers">
+			<list>
+				<bean class="org.springframework.web.servlet.view.BeanNameViewResolver" />
+				<ref bean="viewResolver" />
+			</list>
+		</property>
+		<property name="defaultViews">
+			<list>
+				<bean
+					class="org.springframework.web.servlet.view.json.MappingJacksonJsonView">
+				</bean>
+			</list>
+		</property>
+	</bean>
+	
+	<!--
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/**" />
+			<bean class="cn.com.fsun.filter.SessionTimeoutInterceptor">
+				<property name="excludeUrls">
+					<list>
+						<value>/login</value>
+						<value>/js</value>
+						<value>/css</value>
+						<value>/image</value>
+						<value>/images</value>
+					</list>
+				</property>
+			</bean>
+		</mvc:interceptor>
+	</mvc:interceptors>
+	-->
+	
+	<!-- 拦截器 -->
+	<!--
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/**" />
+			<bean class="org.jeecgframework.core.interceptors.EncodingInterceptor" />
+		</mvc:interceptor>
+		<mvc:interceptor>
+			<mvc:mapping path="/**" />
+			<bean class="org.jeecgframework.core.interceptors.AuthInterceptor">
+				<property name="excludeUrls">
+					<list>
+						<value>loginController.do?goPwdInit</value>
+						<value>loginController.do?pwdInit</value>
+						<value>loginController.do?login</value>
+						<value>loginController.do?checkuser</value>
+						<value>systemController.do?saveFiles</value>
+						<value>systemController.do?saveNews</value>
+						<value>iconController.do?saveIcon</value>
+						<value>userController.do?savesign</value>
+      
+					</list>
+				</property>
+			</bean>
+		</mvc:interceptor>
+	</mvc:interceptors>
+	-->
+</beans>  

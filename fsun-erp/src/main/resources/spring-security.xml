@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	http://www.springframework.org/schema/jdbc  
+	http://www.springframework.org/schema/jdbc/spring-jdbc-3.0.xsd
+	http://www.springframework.org/schema/security 
+	http://www.springframework.org/schema/security/spring-security-3.0.xsd
+	">
+	<!-- auto-config属性其实是<form-login/>,<http-basic/>,<logout/>的缩写.  
+		 没配置登录页面的情况下，spring自动生成一个. -->  
+	<http auto-config="true" use-expressions="true">
+		<intercept-url pattern="/ImageServlet*" filters="none"/>
+		<intercept-url pattern="/view/fileUpLoad.jsp" filters="none" />
+		<intercept-url pattern="/bus/order/shortcutOrder**" filters="none" />
+		<intercept-url pattern="/login.jsp" filters="none" />
+		<intercept-url pattern="/css/**" filters="none"/>
+		<intercept-url pattern="/images/**" filters="none"/>
+		<intercept-url pattern="/uploads/**" filters="none"/>
+		<intercept-url pattern="/**" access="authenticated" />
+		<form-login login-page="/login.jsp" default-target-url="/view/main.jsp"
+			authentication-failure-url="/login.jsp?error=true" />
+		
+		<logout logout-url="/j_spring_security_logout"
+			logout-success-url="/login.jsp" invalidate-session="true" />
+			
+		<!-- 防止同一用户多次登录，使第二次登录失败 
+		即使你不想使用session并发控制，你可以可以这样做。只需将max-sessions的值设置为-1，
+		这样session跟踪会保持可用，但没有最大session个数的限制  -->  	
+		<session-management invalid-session-url="/login.jsp">
+			<concurrency-control max-sessions="1"
+				error-if-maximum-exceeded="true" expired-url="/login.jsp?error=expired" />
+		</session-management>
+		<!-- <remember-me key="pemsConsole"/> -->
+
+		<!--原来的登入验证只是进行了用户名和密码的验证，没有验证码的验证，此过滤器是在原来过滤器之前对验证码进行验证-->
+		<custom-filter before="FORM_LOGIN_FILTER" ref="myUsernamePasswordAuthenticationFilter"/>
+		
+		<!-- 增加一个自定义的filter，放在FILTER_SECURITY_INTERCEPTOR之前， 实现用户、角色、权限、资源的数据库管理。 -->
+		<custom-filter ref="myFilter" before="FILTER_SECURITY_INTERCEPTOR" />
+
+		<access-denied-handler error-page="/nopower.jsp" />
+	</http>
+	
+	<!-- <http auto-config="false" entry-point-ref="loginUrlAuthenticationEntryPoint">
+		<intercept-url pattern="/login.jsp" filters="none" />
+			<custom-filter position="FORM_LOGIN_FILTER" ref="myUsernamePasswordAuthenticationFilter" />
+
+</http> -->
+
+	<beans:bean id="logoutFilter"
+		class="org.springframework.security.web.authentication.logout.LogoutFilter">
+		<beans:constructor-arg value="/login.jsp" />
+		<beans:constructor-arg>
+			<beans:list>
+				<beans:bean
+					class="org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler" />
+			</beans:list>
+		</beans:constructor-arg>
+		<beans:property name="filterProcessesUrl" value="/j_spring_security_logout" />
+	</beans:bean>
+
+	<!-- 验证码过滤器 -->
+	<beans:bean id="myUsernamePasswordAuthenticationFilter"
+		class="cn.com.fsun.filter.MyUsernamePasswordAuthenticationFilter">
+		<!-- 处理登录的action -->  
+		<beans:property name="filterProcessesUrl" value="/j_spring_security_check"></beans:property>
+		<!-- 验证成功后的处理-->  
+		<beans:property name="authenticationSuccessHandler"
+			ref="loginSuccessHandler"></beans:property>
+		<!-- 验证失败后的处理-->  
+		<beans:property name="authenticationFailureHandler"
+			ref="simpleUrlAuthenticationFailureHandler"></beans:property>
+		<beans:property name="authenticationManager" ref="authenticationManager"></beans:property>
+	</beans:bean>
+	
+	<!-- 登录成功 (自定义)-->
+	<beans:bean id="loginSuccessHandler"
+		class="cn.com.fsun.security.LoginSuccessHandler">
+		<beans:property name="defaultTargetUrl" value="/view/main.jsp"></beans:property>
+	</beans:bean>
+	
+	<!-- 登录成功 
+		<beans:bean id="loginLogAuthenticationSuccessHandler"
+			class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler">
+			<beans:property name="defaultTargetUrl" value="/view/index.jsp"></beans:property>
+		</beans:bean>
+		-->
+	
+	<!-- 登录失败 -->
+	<beans:bean id="simpleUrlAuthenticationFailureHandler"
+		class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
+		<beans:property name="defaultFailureUrl" value="/login.jsp?error=true"></beans:property>
+	</beans:bean>
+	
+	<!-- 未登录的切入点 -->  
+	<beans:bean id="loginUrlAuthenticationEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
+		<beans:property name="loginFormUrl" value="/login.jsp"/>
+	</beans:bean>
+
+	<!-- 一个自定义的filter，必须包含authenticationManager, accessDecisionManager,securityMetadataSource三个属性。 -->
+	<beans:bean id="myFilter"
+		class="cn.com.fsun.security.MyFilterSecurityInterceptor">
+		<!-- 用户拥有的权限 -->
+		<beans:property name="authenticationManager" ref="authenticationManager" />
+		<!-- 用户是否拥有所请求资源的权限 -->
+		<beans:property name="accessDecisionManager" ref="myAccessDecisionManager" />
+		<!-- 资源与权限对应关系 --> 
+		<beans:property name="securityMetadataSource" ref="mySecurityMetadataSource" />
+	</beans:bean>
+
+	<!-- 注意能够为authentication-manager 设置alias别名 -->
+	<authentication-manager alias="authenticationManager">
+		<authentication-provider user-service-ref="userDetailsService">
+			<password-encoder ref="passwordEncoder">
+				<salt-source user-property="username" />
+			</password-encoder>
+		</authentication-provider>
+	</authentication-manager>
+
+
+	<!-- 访问决策器，决定某个用户具有的角色，是否有足够的权限去访问某个资源。 -->
+	<beans:bean id="myAccessDecisionManager"
+		class="cn.com.fsun.security.MyAccessDecisionManager">
+	</beans:bean>
+
+
+	<!-- 资源源数据定义，将所有的资源和权限对应关系建立起来，即定义某一资源可以被哪些角色去访问。 -->
+	<beans:bean id="mySecurityMetadataSource"
+		class="cn.com.fsun.security.MyInvocationSecurityMetadataSourceService">
+		<!-- <beans:property name="menuClient" ref="menuClient"/> -->
+		<!--这是构造函数注入这里通过注解来注入-->
+		<beans:constructor-arg ref="menuService" />
+		<beans:constructor-arg ref="powerService" />	
+	</beans:bean>
+
+	<!-- 事件监听:实现了 ApplicationListener监听接口, 包括AuthenticationCredentialsNotFoundEvent 
+		事件， AuthorizationFailureEvent事件，AuthorizedEvent事件， PublicInvocationEvent事 
+		件。 -->
+	<!-- <beans:bean class="org.springframework.security.authentication.event.LoggerListener" 
+		/> -->
+	<!-- 用户的密码加密或解密 -->
+	<beans:bean id="passwordEncoder"
+		class="org.springframework.security.authentication.encoding.Md5PasswordEncoder" />
+
+
+	<!-- 用户详细信息管理：数据源、用户缓存（通过数据库管理用户、角色、权限、资源）。 -->
+	<beans:bean id="userDetailsService"
+		class="cn.com.fsun.security.MyUserDetailsService">
+		<!-- 属性注入(需要提供默认的构造函数 )这里通过注解来注入-->
+		<beans:property name="userService" ref="userService" />
+	</beans:bean>
+
+	<!-- 启用用户的缓存功能 -->
+	<!-- <beans:bean id="userCache" class="org.springframework.security.core.userdetails.cache.EhCacheBasedUserCache"> 
+		<beans:property name="cache" ref="userEhCache" /> </beans:bean> <beans:bean 
+		id="userEhCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean"> 
+		<beans:property name="cacheName" value="userCache" /> <beans:property name="cacheManager" 
+		ref="cacheManager" /> </beans:bean> <beans:bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean" 
+		/> -->
+
+	<!-- spring security自带的与权限有关的数据读写Jdbc模板 -->
+	<!-- <beans:bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate"> 
+		<beans:property name="dataSource" ref="dataSource" /> </beans:bean> -->
+	
+	<!-- 定义上下文返回的消息的国际化。 -->
+	<beans:bean id="messageSource"
+		class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<beans:property name="basename"
+			value="classpath:cn/com/fsun/security/messages_zh_CN" />
+	</beans:bean>
+</beans:beans>

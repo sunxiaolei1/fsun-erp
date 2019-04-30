@@ -1,0 +1,123 @@
+.progress_bar{
+	 /* border:2px solid #ffffff; */
+	 width:250px;
+	 height:77px;
+	 line-height:85px;
+	 padding:0 3px;
+	 position:fixed;
+	 left:50%;
+	 margin-left:-140px;
+	 top:50%;
+	 margin-top:-40px;
+	 font-size:12px;
+	 color:#fff;
+	 font-weight:bold;
+	 text-align:center;
+	 background-color:#50a7ff;
+	 border-radius:5px;
+	 z-index:1011;
+}
+
+.progress_bar img{
+	position:relative;top:10px;left:-8px;
+}
+ /*<div class="progress_bar_mask" id="ext-gen1242"></div>*/    
+.progress_bar_mask{
+	background: #666 none repeat scroll 0 0;
+  	opacity: 0.7;
+  	position:absolute;
+  	/* height: 727px;
+	width: 1440px; */
+	left: 0;
+	right: auto;
+	top: 0;
+	z-index: 1007;
+}
+
+/*.msg_div{
+	width:250px;
+	height:100px;
+	border:1px solid #ccc;
+	border-radius:5px;
+	-moz-box-shadow: 2px 2px 10px #909090;
+	-webkit-box-shadow: 2px 2px 10px #909090;
+	box-shadow:2px 2px 10px #909090;
+	line-height:108px;
+	position:fixed;
+	left:50%;
+	margin-left:-140px;
+	top:50%;
+	margin-top:-40px;
+	font-size:14px;
+	color:#666;
+	font-weight:bold;
+	background-color:#fff;
+	z-index:19011;
+}
+.msg_img_div{
+	float: left; 
+	text-align: right;
+	margin-top: 25px;
+	margin-right:10px; 
+	width: 27%;
+}
+.msg_text_div{
+	line-height: 100px; 
+	float: left; 
+	width: 65%;
+}*/
+.msg_div{
+	width:300px;
+	height:122px;
+	border:1px solid #ccc;
+	-moz-box-shadow: 2px 2px 10px #909090;
+	-webkit-box-shadow: 2px 2px 10px #909090;
+	box-shadow:2px 2px 10px #909090;
+	position:fixed;
+	left:50%;
+	margin-left:-150px;
+	top:-90px;
+	/*top:50%;
+	margin-top:-61px;*/
+	font-size:14px;
+	color:#666;
+	font-weight:bold;
+	 /*text-align:center;*/
+	background-color:#fff;
+	border-radius:5px;
+	z-index:1010;
+}
+.msg_img_div{
+	float: left; 
+	text-align: right;
+	margin-top: 25px;
+	width: 20%;
+	margin-left:5%;
+}
+.msg_text_div{
+	float: right; 
+	width: 67%;
+	line-height:28px;
+	margin-top: 10px;
+	margin-right: 3%;
+	height:85px;
+	text-align:center;
+}
+
+.confirm_div{
+	height:180px;
+	top:50%;
+	margin-top:-90px;
+}
+.confirm_img_div{
+	width: 27%;
+}
+.confirm_text_div{
+	width: 63%;
+	margin-top: 20px;
+}
+.confirm-blue-btn,.confirm-gray-btn{display:inline-block;border-radius:3px;border-width:1px;height:28px;padding:0 15px;color:#fff;font-size:12px;margin:0 5px;cursor:pointer;}
+
+.confirm-blue-btn{background:url(../images/v4.1.0/vm-user/blue-btn-bg.jpg) repeat-x;border:1px #389fe2 solid; }
+.confirm-gray-btn{background:url(../images/v4.1.0/vm-user/gray-btn-bg.jpg) repeat-x;border:1px #96a1a7 solid;}
+.confirm_to_buton {margin:30px 0px 0px;text-align:center;}

@@ -1,0 +1,103 @@
+@charset "utf-8";
+*{margin:0;padding:0;list-style-type:none;}
+a,img{border:0;}
+body{font:12px/180% Arial, Helvetica, sans-serif, "新宋体";}
+
+/* wait_photo */
+.wait_photo{width:1200px;margin:0 auto;}
+.wait_photo li{ margin-top:5px;margin-left:5px;float:left;height:253px;display:none;}
+.wait_photo .page_photo {width:480px;margin-top:5px;height:510px;}
+.wait_photo li img{ height:253px;width:332px;}
+.wait_photo .page_photo img {height:510px;width:480px;}
+
+.page_photo_san{margin-top:-253px;}
+.wait_photo li p{
+	right:0px;width:100%;height:50px;position:relative;bottom:0px;top:-50px;
+    background:-moz-linear-gradient(bottom,rgba(0,0,0,0.9) 0,rgba(0,0,0,0) 100%);
+    background:-webkit-gradient(linear,left bottom,left top,color-stop(0%,rgba(0,0,0,0.8)),color-stop(100%,rgba(0,0,0,0)));
+    background:-webkit-linear-gradient(bottom,rgba(0,0,0,0.9) 0,rgba(0,0,0,0) 100%);
+    background:-o-linear-gradient(bottom,rgba(0,0,0,0.9) 0,rgba(0,0,0,0) 100%);
+	background:-ms-linear-gradient(bottom,rgba(0,0,0,0.9) 0,rgba(0,0,0,0) 100%);
+    background:linear-gradient(to top,rgba(0,0,0,0.9) 0,rgba(0,0,0,0) 100%);
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#00000000,endColorstr=#CC000000)
+    -ms-filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#00000000,endColorstr=#CC000000);
+}
+.wait_photo .page_photo p{
+	right:0px;width:100%;height:50px;bottom:0px;margin-top:1px;
+    background:-moz-linear-gradient(bottom,rgba(0,0,0,0.9) 0,rgba(0,0,0,0) 100%);
+    background:-webkit-gradient(linear,left bottom,left top,color-stop(0%,rgba(0,0,0,0.8)),color-stop(100%,rgba(0,0,0,0)));
+    background:-webkit-linear-gradient(bottom,rgba(0,0,0,0.9) 0,rgba(0,0,0,0) 100%);
+    background:-o-linear-gradient(bottom,rgba(0,0,0,0.9) 0,rgba(0,0,0,0) 100%);
+	background:-ms-linear-gradient(bottom,rgba(0,0,0,0.9) 0,rgba(0,0,0,0) 100%);
+    background:linear-gradient(to top,rgba(0,0,0,0.9) 0,rgba(0,0,0,0) 100%);
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#00000000,endColorstr=#CC000000)
+    -ms-filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#00000000,endColorstr=#CC000000);
+}
+.wait_photo .page_photo p img{margin-left:10px;}
+.wait_photo li p a{font-size:14px;font-family:"微软雅黑";color:#fff;text-shadow:1px 1px 0 rgba(0, 0, 0, 1);margin-left:2px;}
+.wait_photo li p span{width:100%;margin-top:12px;float:left;}
+.wait_photo li p a img{margin-left:5px;}
+.wait_photo li p a:hover{color:#e7410d;}
+
+/*列表右上角的悬浮按钮*/
+.float_tool_div{
+	width:65px;
+	height:20px;
+	position:fixed;
+	left:93%;
+	top:5px;
+	font-size:14px;
+	color:#666;
+	font-weight:bold;
+	z-index:9011;
+}
+
+/*列表右下角的悬浮按钮*/
+.float_action_div{
+	width:35px;
+	height:80px;
+	position:fixed;
+	left:95%;
+	top:80%;
+	font-size:14px;
+	color:#666;
+	font-weight:bold;
+	z-index:9011;
+}
+
+.float_action_div a{
+	margin:5px 0;
+	display:inline-block;
+	cursor:pointer;
+}
+
+.up-btn{
+	height:32px;width:32px;
+	background-image: url(../images/image_search/btn/up.png);
+}
+.down-btn{
+	height:32px;width:32px;
+	background-image: url(../images/image_search/btn/down.png);
+}
+
+.head-title{
+	padding: 5px;
+	height:18px;
+	fit:true;
+	border-color: #a1afbb;
+	background: rgba(0, 0, 0, 0) linear-gradient(to bottom, #f8f8f8 0px, #eeeeee 100%) repeat-x scroll 0 0;
+	border-style: solid;
+    border-width: 1px;
+}
+
+.head-title span {
+	color: #575765; 
+	font-weight: bold; 
+	height: 16px; 
+	line-height: 16px;
+	font-family: Arial,Helvetica,sans-serif,'宋体';
+	font-size: 12px;
+	text-align: left;
+	padding-left:20px;
+	background: rgba(0, 0, 0, 0) url("../js/jquery-easyui/themes/icons/search.png") no-repeat scroll 0 0;
+}

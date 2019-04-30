@@ -1,0 +1,88 @@
+.clear{clear:both;line-height:0;padding:0;margin:0;font-size:0; border:0;overflow:hidden;}
+.left{float:left;}
+.right{float:right;}
+.tl{text-align:left;}
+.tr{text-align:right;}
+.tc{text-align:center;}
+ul,li{list-style:none;}
+.title{text-align:center;font-size:22px; margin:40px 0 20px 0;font-family:"KaiTi",serif,"microsoft yahei";}
+title1{border-top:1px #d8e6f3 solid;height:40px;margin-bottom:5px;}
+h2{height:18px;line-height:18px;color:#259ff2;font-size:13px;margin-left:4px;}
+/*列表右上角的悬浮按钮*/
+.float_tool_div{
+	width:65px;
+	height:20px;
+	position:fixed;
+	left:93%;
+	top:5px;
+	font-size:14px;
+	color:#666;
+	font-weight:bold;
+	z-index:9011;
+}
+
+/*虚拟机分步骤设置*/
+.step-wrap{width:1000px;margin:0px auto 0 auto;font-size:14px;}
+.step-content{border:1px #ccc solid;border-radius:3px;padding:25px 0 0 0;margin-bottom:10px;}
+.step-content ul li{ float:left;padding-bottom:7px;}
+.step-content ul li.tr{ width:20%;}
+.step-content ul li.tr1{ width:35%;text-align:right;}
+.step-content ul li.tr11{ width:35%;text-align:right;color:#259ff2;}
+.step-content ul li.tr12{ width:35%;text-align:right;color:#FF6699;}
+.step-content ul li.tr13{ width:35%;text-align:right;color:#FF0033;}
+.step-content ul li.tr2{ width:10%;text-align:right;color:gray;}
+.step-content ul li.tr3{ width:16%;text-align:right;color:#CCDDFF;}
+.step-content ul li.tr31{ width:16%;text-align:left;color:#CCDDFF;}
+.step-content ul li.tr4{ width:16%;text-align:right;color:#259ff2;}
+.step-content ul li.tr41{ width:16%;text-align:left;color:#259ff2;}
+.step-content ul li.tr5{ width:16%;text-align:right;color:#FF6699;}
+.step-content ul li.tr51{ width:16%;text-align:left;color:#FF6699;}
+.step-content ul li.tr6{ width:16%;text-align:right;color:#FF0033;}
+.step-content ul li.tr61{ width:16%;text-align:left;color:#FF0033;}
+.step-content ul li.tl{ width:29%;}
+.step-content ul li.tl2{ width:80%;}
+.step-content ul li.tl3{ width:72%;}
+.step-content ul li.tl4{ width:60%;}
+.step-content ul li.tl5{ width:40%;}
+.step-content ul li.tl6{ width:65%;}
+.step-content ul li.tl7{ width:18%;}
+.step-content ul li.tl8{ width:100%;}
+.step-content ul li.tl9{ width:34%;}
+.step-content ul li.tl10{ width:84%;}
+.step-content ul li.tl11{ width:22%;}
+.step-content ul li.tl12{ width:57%;}
+.step-content ul li.tl13{ width:50%;}
+
+.yulan{margin:0 0 3px 0 ;margin-left:5px; border:1px #ccc solid;background:#f7f7f7; text-align:center;padding:5px 0;width:95%;}
+.yulan img{width:95%;height:65%;}	
+.yulan1{margin:0 0 3px 0 ;margin-left:5px; border:1px #ccc solid;background:#f7f7f7; text-align:center;padding:5px 0;width:95%;}
+.yulan1 img{width:95%;height:100%;}	
+.del{border:0;background:#333;color:#fff;padding:2px 0;cursor:pointer; position:absolute; right:5px; width:50px;}
+.border
+{
+   box-shadow: 2px 2px 3px  rgba(34,25,25,0.4) ;
+    -moz-box-shadow: 2px 2px 3px  rgba(34,25,25,0.4) ;
+    -webkit-box-shadow: 2px 2px 3px rgba(34,25,25,0.4) ;
+  cursor:pointer;      
+}
+
+.step-content input[type="text"]{/*border:1px #ccc solid;*/background-color:#fff;height:24px;line-height:24px;/*padding:0 10px;*/margin:0;font-family:Arial, Helvetica, sans-serif,"Microsoft YaHei";}
+.step-content input[type="radio"]{margin-right: 6px;};
+.step-content select{/*border:1px #ccc solid;*/line-height:24px;/*padding:2px 10px;*/font-family:Arial, Helvetica, sans-serif,"Microsoft YaHei"; }
+.step-content textarea{width:95%;heigth:100px;border:1px #ccc solid;background-color:#fff;padding:2px 10px;font-size:14px;line-height:24px; font-family:Arial, Helvetica, sans-serif,"Microsoft YaHei";}
+
+
+
+/*分步骤*/
+.step-by-step{margin:0px auto 10px auto; position: relative;height:80px; text-align:center;}
+.step-by-step-bg{ position:absolute;top:15px;left:340px; background:url(../images/v4.1.0/circle-bg.png) repeat-x;width:300px;height:45px;;}
+.step-by-step-num{ position:absolute;top:0;left:90px; z-index:1000;}
+.step-by-step-num a{position:relative; display:inline-block;width:130px;}
+.step-by-step-num a h2{ position: absolute;top:0;left:243px;}
+.step-by-step-num a span{ position: absolute;top:55px;left:203;display:inline-block;width:100%; text-align:center; }
+.step-by-step-num a:hover{ color:#333; text-decoration:none;}
+.step-by-step-num a h2,.step-by-step a.step-on h2{display:block;width:45px;height:45px;color:#fff; text-align: center;line-height:45px;font-size:20px;margin:0 auto 10px auto;}
+.step-by-step-num a h2{ background:url(../images/v4.1.0/yuan.png) 0 0 no-repeat;}
+.step-by-step-num a span,.step-by-step-num a:link span,.step-by-step-num a:visited span{color:#333;}
+.step-by-step-num a.step-on h2,.step-by-step-num a:hover h2{background:url(../images/v4.1.0/yuan.png) 0 -45px no-repeat;}
+.step-by-step-num a.step-on span,.step-by-step-num a:hover span{color:#0099FF;}
