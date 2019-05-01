@@ -136,8 +136,28 @@
         detailGird.datagrid("reload");
     }
 	
+	
 	//excel表模板导出
 	function templateDownload(){
+		var proxyCode = $("#proxyCodeText").val();
+		var productName = $("#productNameText").val(); 
+		var customerCode = $("#customerCodeCombo").combogrid("getValue");
+		var startDate = $("#startDate").datebox("getValue");
+    	var endDate = $("#endDate").datebox("getValue");
+    	
+    	window.location.href = '<c:url value="/bus/summary/proxyDetail/excelExport?'
+    		+ 'proxyCode=' + proxyCode 
+    		+ '&productName=' + encodeURI(encodeURI(productName))
+    		+ '&customerCode=' + customerCode
+    		+ '&startDate=' + startDate 
+    		+ '&endDate=' + endDate 
+    		+ '&sort=' + 'proxyCode desc,detail.id'
+    		+ '&order=asc "/>';
+    	       
+	}
+	
+	//excel表模板导出
+	function templateDownload1(){
 	    
 		var proxyCode = $("#proxyCodeText").val();
 		var productName = $("#productNameText").val(); 

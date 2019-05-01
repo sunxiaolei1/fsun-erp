@@ -62,8 +62,12 @@ public class DeliveryDetailDao extends BaseDao<BusDeliveryDetail> {
 				detachedCriteria.addOrder(Order.desc(pageInfo.getSortColumn()));
 			else
 				detachedCriteria.addOrder(Order.asc(pageInfo.getSortColumn()));
+		}else{
+			detachedCriteria.addOrder(Order.desc("deliveryCode"));
+			detachedCriteria.addOrder(Order.asc("productCode"));
+			detachedCriteria.addOrder(Order.asc("style"));
 		}
-		detachedCriteria.addOrder(Order.desc("deliveryCode"));
+		
 		return detachedCriteria;
 	}
 	

@@ -154,6 +154,26 @@
 		var customerCode = $("#customerCodeCombo").combogrid("getValue");
 		var startDate = $("#startDate").datebox("getValue");
     	var endDate = $("#endDate").datebox("getValue");
+    	
+    	window.location.href = '<c:url value="/bus/summary/deliveryDetail/excelExport?'
+    		+ 'orderCode=' + orderCode 
+    		+ '&deliveryCode=' + deliveryCode 
+    		+ '&customerCode=' + customerCode 
+    		+ '&startDate=' + startDate 
+    		+ '&endDate=' + endDate 
+    		+ '&sort=' + 'deliveryCode desc,detail.productCode asc,detail.style' 
+    		+ '&order=asc "/>';
+    	       
+	}
+	
+	
+	//excel表模板导出
+	function templateDownload1(){
+	    var orderCode = $("#orderCodeText").val();
+		var deliveryCode = $("#deliveryCodeText").val();
+		var customerCode = $("#customerCodeCombo").combogrid("getValue");
+		var startDate = $("#startDate").datebox("getValue");
+    	var endDate = $("#endDate").datebox("getValue");
 		 $.messager.progress({title: '请等待',msg: '明细导出中...',text: '',interval: 700});
          $.ajax({
              type: "post",

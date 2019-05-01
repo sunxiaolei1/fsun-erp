@@ -38,7 +38,9 @@
 <script type="text/javascript">
 
 	var detailGird = '';
-	
+	var mergeCells = ["proxyCode","customerName","customerCode","hasPaid","orderPrice",
+	                  "remark","receiveTime","createManName","createTime"];
+	var mergeUnique = "proxyCode";
 	
 	//页面加载时，初始化datagrid
     $(function () {  
@@ -68,7 +70,7 @@
 		{field:"receiveTime",title:"交货日期",width:90,align:"center",sortable:true},				
 		{field:"createManName",title:"制单人",width:70,align:"center"},
 		{field:"createTime",title:"制单时间",width:130,align:"center",sortable:true},	
-		{field:"productName",title:"产品名称",width:180,align:"center"},
+		{field:"productName",title:"产品名称",width:200,align:"center"},
 		{field:"model",title:"生产机型",width:90,align:"center"},
 		{field:"process",title:"工序",width:90,align:"center"},
 		{field:"psNumber",title:"ps版数量",width:80,align:"center"},
@@ -96,8 +98,8 @@
             url:'<c:url value="/bus/summary/proxyDetail/getDetailSummary"/>',
             queryParams:{},
             remoteSort:true,
-            sortName:"createTime",
-            sortOrder:"desc",
+            sortName:"proxyCode desc, detail.id",
+            sortOrder:"asc",
             singleSelect:false,//是否单选
             remoteFilter:true,
             rownumbers:true,//行号
@@ -113,13 +115,46 @@
 		   	onLoadSuccess:function(data){		       			
    				if(data.rows.length>0){         				   	
        				//调整行号的宽度
-    	        	$(this).datagrid("fixRownumber");       	        	  					    						     			
+    	        	$(this).datagrid("fixRownumber");  
+    	        	autoMergeCells(data.rows, mergeCells);
        			}       					  					     			        			
     		}
         });
     	
     }
     
+    /**
+     * 合并相同行数据
+     */
+    function autoMergeCells(rows, mergeCells){
+    	//只有相同行合并唯一性字段和是否支持相同行单元格合并同时满足才可进行合并		        	
+    	if(mergeCells && mergeUnique){
+    		//data是默认的表格加载数据，包括rows和Total
+       		var mark=1;                                                 
+        	//这里涉及到简单的运算，mark是计算每次需要合并的格子数
+        	for (var i=1; i <rows.length; i++) {     
+        		//这里循环表格当前的数据
+        		if (rows[i][mergeUnique] == rows[i-1][mergeUnique]) {   
+        			//后一行的值与前一行的值做比较，相同就需要合并
+       				mark += 1; 
+        			$.each(mergeCells, function(){
+        				var field = this;
+        				detailGird.datagrid('mergeCells',{ 
+            				//datagrid的index，表示从第几行开始合并；紫色的内容需是最精髓的，就是记住最开始需要合并的位置
+    						index: i+1-mark,
+            				//合并单元格的区域，就是clomun中的filed对应的列
+            				field: field, 
+            				//纵向合并的格数，如果想要横向合并，就使用colspan：mark
+            				rowspan:mark                   
+            			});
+        			});   			 
+        		}else{
+        			//一旦前后两行的值不一样了，那么需要合并的格子数mark就需要重新计算
+       				mark=1;                                         
+        		}
+        	}
+    	}
+    }
       
 </script>
 <!---------------------------------------------显示DataGrid代码---------------------------------------------->

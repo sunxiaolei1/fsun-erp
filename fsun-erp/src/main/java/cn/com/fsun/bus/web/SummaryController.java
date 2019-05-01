@@ -5,10 +5,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+
 import cn.com.fsun.bus.dto.BuyDetailDto;
 import cn.com.fsun.bus.dto.BuyInfoDto;
 import cn.com.fsun.bus.dto.DeliverySummaryDto;
@@ -35,6 +38,9 @@ import cn.com.fsun.bus.service.OrderService;
 import cn.com.fsun.bus.service.SummaryService;
 import cn.com.fsun.bus.service.itf.DeliveryDetailSummaryService;
 import cn.com.fsun.bus.service.itf.ProxyDetailSummaryService;
+import cn.com.fsun.common.excel.CellRegionDto;
+import cn.com.fsun.common.excel.ColumnDto;
+import cn.com.fsun.common.excel.NewExcelUtil;
 import cn.com.fsun.common.result.JsonUtil;
 import cn.com.fsun.common.utils.DateUtil;
 import cn.com.fsun.common.utils.PageInfo;
@@ -414,29 +420,29 @@ public class SummaryController extends BaseController{
 	}
 	
 	
-	/*@RequestMapping(value = "/deliveryDetail/excelExport", method={RequestMethod.GET,RequestMethod.POST})
-	public ModelAndView deliveryDetailExcelExport(ModelMap model, HttpServletRequest request,
+	@RequestMapping(value = "/deliveryDetail/excelExport", method={RequestMethod.GET,RequestMethod.POST})
+	public void deliveryDetailExcelExport(ModelMap model, HttpServletRequest request,
 		HttpServletResponse response, DeliverySummaryDto deliverySummaryDto){
-		//view_excel是在spring配置文件里配置的ExcelRevenueReportView,第二个和第三个参数采用键值对方法提供给buildExcelDocument方法使用
-		model.addAttribute("fileName", "送货单查询信息表");
-		HashMap<String,String> header = new HashMap<String,String>();
-	
+		
+		LinkedHashMap<String,String> header = new LinkedHashMap<String,String>();
 		header.put("deliveryCode", "送货单号");
 		header.put("deliveryTypeName", "单据类型");
-		header.put("customerName", "客户名称");
-		header.put("receiveTime", "收货时间");
-		header.put("receiveStatus", "收货状态");
-		header.put("createManName", "制单人");
-		header.put("createTime", "制单时间");
-		
+		header.put("customerCode", "客户编号");
+		header.put("customerName", "客户名称");	
+		header.put("productCode", "产品编号");
 		header.put("productName", "产品名称");
 		header.put("style", "款号");
 		header.put("number", "数量");
 		header.put("unit", "单位");
-		header.put("onePrice", "单价");
-		header.put("allPrice", "总价");
+		header.put("onePrice", "单价(元)");
+		header.put("allPrice", "总价(元)");
+		
+		header.put("receiveTime", "收货时间");
+		header.put("receiveStatus", "收货状态");
+		header.put("orderCode", "相关订单号");
+		header.put("createManName", "制单人");
+		header.put("createTime", "制单时间");
 		header.put("description", "备注");	
-		model.addAttribute("titles", header);
 		
 		PageInfo pageInfo = new PageInfo();
 		if(null!= deliverySummaryDto){
@@ -452,14 +458,38 @@ public class SummaryController extends BaseController{
 			if(deliverySummaryDto.getEndDate() !=null &&!"".equals(deliverySummaryDto.getEndDate())){
 				pageInfo.setEndDate(deliverySummaryDto.getEndDate()+" 23:59:59");
 			}
-		}		
-		List<DeliveryExportDto> data = deliveryDetailSummaryService.excelExport(deliverySummaryDto,pageInfo);
-		model.addAttribute("data", data);
+		}
 		
-		ExportExcel exportExcel =  new ExportExcel(deliverySummaryDto);
-		return new ModelAndView(exportExcel,model);
+		List<ColumnDto> columnDtos = new ArrayList<>();
+		int colNo = 0;
+		for (String key : header.keySet()) {
+			ColumnDto columnDto = new ColumnDto();
+			columnDto.setCellLevel(1);
+			columnDto.setContent(header.get(key));
+			columnDto.setFieldName(key);
+			if("deliveryCode".equals(key)){
+				columnDto.setMergeUnique(true);
+			}	
+			if(("deliveryCode,deliveryTypeName,customerCode,customerName,receiveTime,"
+					+ "receiveStatus,orderCode,createManName,createTime,description").contains(key)){
+				columnDto.setMergeCell(true);	
+			}				
+			//列元素定位
+			CellRegionDto cellRegionDto = new CellRegionDto();
+			cellRegionDto.setFirstCol(colNo);
+			cellRegionDto.setLastCol(colNo);
+			columnDto.setCellRegionDto(cellRegionDto);
+			colNo++;					
+			columnDtos.add(columnDto);
+		}		
+		List<DeliverySummaryDto> details = deliveryDetailSummaryService.search(deliverySummaryDto, pageInfo, false);		
+		try {
+			NewExcelUtil.listToExcel(details, header, columnDtos, "客户对账单-送货单", response);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
-	*/
 	
 	
 	
@@ -549,6 +579,90 @@ public class SummaryController extends BaseController{
 			e.printStackTrace();
 			return JsonUtil.getResult(Boolean.FALSE);
 		}		
+	}
+	
+	
+	@RequestMapping(value = "/proxyDetail/excelExport", method={RequestMethod.GET,RequestMethod.POST})
+	public void proxyDetailExcelExport(ModelMap model, HttpServletRequest request,
+		HttpServletResponse response, ProxySummaryDto proxySummaryDto){
+		
+		LinkedHashMap<String,String> header = new LinkedHashMap<String,String>();
+		header.put("proxyCode", "加工单号");
+		header.put("customerName", "客户名称");
+		header.put("customerCode", "客户编号");
+		header.put("hasPaid", "是否付款");
+		header.put("orderPrice", "单据金额");
+		header.put("remark", "注意事项");
+		header.put("receiveTime", "交货日期");
+		header.put("createManName", "制单人");
+		header.put("createTime", "制单时间");		
+		
+		header.put("productName", "产品名称");
+		header.put("model", "生产机型");
+		header.put("process", "工序");
+		header.put("psNumber", "ps版数量");
+		header.put("layout", "印刷方式");
+		header.put("colorsName", "色数");
+		header.put("number", "印刷数量");
+		header.put("loss", "印损");
+		header.put("descr", "备注");	
+		
+		PageInfo pageInfo = new PageInfo();
+		if(null!= proxySummaryDto){
+			
+			String productName = proxySummaryDto.getProductName();
+			if(StringUtils.isNotEmpty(productName)){
+				try {
+					proxySummaryDto.setProductName(URLDecoder.decode(productName,"utf-8"));
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+			if(StringUtils.isNotEmpty(proxySummaryDto.getSort())){
+				pageInfo.setSortColumn(proxySummaryDto.getSort());
+			}
+			if(StringUtils.isNotEmpty(proxySummaryDto.getOrder())){
+				pageInfo.setSortType(proxySummaryDto.getOrder());
+			}
+			if(proxySummaryDto.getStartDate() !=null &&!"".equals(proxySummaryDto.getStartDate())){
+				pageInfo.setStartDate(proxySummaryDto.getStartDate()+" 00:00:00");
+			}
+			if(proxySummaryDto.getEndDate() !=null &&!"".equals(proxySummaryDto.getEndDate())){
+				pageInfo.setEndDate(proxySummaryDto.getEndDate()+" 23:59:59");
+			}
+		}
+		
+		List<ColumnDto> columnDtos = new ArrayList<>();
+		int colNo = 0;
+		for (String key : header.keySet()) {
+			ColumnDto columnDto = new ColumnDto();
+			columnDto.setCellLevel(1);
+			columnDto.setContent(header.get(key));
+			columnDto.setFieldName(key);
+			if("proxyCode".equals(key)){
+				columnDto.setMergeUnique(true);
+			}	
+			if(("proxyCode,customerName,customerCode,hasPaid,orderPrice,"
+					+ "remark,receiveTime,createManName,createTime").contains(key)){
+				columnDto.setMergeCell(true);	
+			}				
+			//列元素定位
+			CellRegionDto cellRegionDto = new CellRegionDto();
+			cellRegionDto.setFirstCol(colNo);
+			cellRegionDto.setLastCol(colNo);
+			columnDto.setCellRegionDto(cellRegionDto);
+			colNo++;					
+			columnDtos.add(columnDto);
+		}		
+		List<ProxySummaryDto> details = proxyDetailSummaryService.search(proxySummaryDto, pageInfo, false);		
+		try {
+			NewExcelUtil.listToExcel(details, header, columnDtos, "客户对账单-加工单", response);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 }
